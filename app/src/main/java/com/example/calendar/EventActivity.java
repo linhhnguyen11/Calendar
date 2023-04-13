@@ -251,6 +251,7 @@ public class EventActivity extends AppCompatActivity {
                         AlarmManager alarmManager=(AlarmManager) getSystemService(Context.ALARM_SERVICE);
 
                         Intent intent= new Intent(this, Alarm.class);
+                        intent.setAction("MyAction");
                         intent.putExtra("mess", titleEvent.getText().toString());
                         PendingIntent pendingIntent=PendingIntent.getBroadcast(this,0,intent,PendingIntent.FLAG_CANCEL_CURRENT);
                         alarmManager.set(AlarmManager.RTC_WAKEUP,alarmStartTime,pendingIntent);
