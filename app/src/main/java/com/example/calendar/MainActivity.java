@@ -174,7 +174,6 @@ public class MainActivity extends AppCompatActivity {
                 yearSelect = clickedDayCalendar.get(clickedDayCalendar.YEAR);
 
                 calendar.set(yearSelect, monthSelect, daySelect);
-                System.out.println(calendar);
                 dateChoice = simpleDateFormat.format(calendar.getTime());
                 //Lưu dữ liệu vào Array
                 clearArrays();
@@ -193,7 +192,7 @@ public class MainActivity extends AppCompatActivity {
                 intent.putExtra("Dayofevent", daySelect);
                 intent.putExtra("Monthofevent", monthSelect);
                 intent.putExtra("Yearofevent", yearSelect);
-                startActivity(intent);
+                someActivityResultLauncher.launch(intent);
             }
         });
         todayBtn.setOnClickListener(new View.OnClickListener() {

@@ -243,6 +243,9 @@ public class EventActivity extends AppCompatActivity {
                         calendar.set(Calendar.HOUR,timeStartValue.getHours());
                         calendar.set(Calendar.MINUTE,timeStartValue.getMinutes());
                         calendar.set(Calendar.SECOND,0);
+                        System.out.println(calendar);
+                        System.out.println(timeStartValue.getHours());
+                        System.out.println(timeStartValue.getMinutes());
                         long alarmStartTime = calendar.getTimeInMillis();
                         System.out.println("giờ báo thức trang even: "+calendar.getTimeInMillis());
                         AlarmManager alarmManager=(AlarmManager) getSystemService(Context.ALARM_SERVICE);
@@ -265,8 +268,9 @@ public class EventActivity extends AppCompatActivity {
                     Toast.makeText(getApplicationContext(), "not done",
                             Toast.LENGTH_SHORT).show();
                 }
-                Intent intent = new Intent(getApplicationContext(),MainActivity.class);
-                startActivity(intent);
+            Intent intent = new Intent(getApplicationContext(),MainActivity.class);
+            setResult(RESULT_OK, intent);
+            finish();
 
         }
     }
