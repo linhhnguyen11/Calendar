@@ -94,7 +94,7 @@ public class DBHelper extends SQLiteOpenHelper {
         if(result == -1 ){
             Toast.makeText(context, "Failed", Toast.LENGTH_SHORT).show();
         } else {
-            Toast.makeText(context, "Success", Toast.LENGTH_SHORT).show();
+            System.out.println("Success");
         }
     }
 

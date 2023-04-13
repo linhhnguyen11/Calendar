@@ -37,23 +37,21 @@
         android:clickable="true"
         android:contentDescription="@string/app_name"
         android:focusable="true"
+        app:backgroundTint="#009688"
         app:srcCompat="@drawable/ic_add" />
 
     <Button
-        android:id="@+id/currDay"
-        style="@style/Widget.Material3.Button.TextButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:id="@+id/todayBtn"
+        android:layout_width="56dp"
+        android:layout_height="56dp"
         android:layout_alignParentRight="true"
         android:layout_alignParentBottom="true"
-        android:layout_marginRight="105dp"
+        android:layout_marginRight="118dp"
         android:layout_marginBottom="27dp"
-        android:clickable="true"
-        android:contentDescription="@string/app_name"
-        android:focusable="true"
+        android:background="@drawable/circle_button"
         android:text="10"
-
-        android:visibility="visible" />
+        android:visibility="invisible"
+        />
 
     <!--    <com.google.android.material.floatingactionbutton.FloatingActionButton-->
     <!--        android:id="@+id/addE"-->

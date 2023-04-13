@@ -60,6 +60,7 @@ public class MainActivity extends AppCompatActivity {
 
 
     RecyclerView recyclerView;
+    Button todayBtn;
     DBHelper mydb;
 
     String dateChoice;
@@ -70,19 +71,18 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        System.out.println("AAAAAAAAAAAAAAAAAA");
-        CalendarView calendarView = findViewById(R.id.calendarView);
-
         //Layouts
-
+        CalendarView calendarView = findViewById(R.id.calendarView);
         FloatingActionButton addEvent = findViewById(R.id.addE);
         recyclerView = findViewById(R.id.recycleView);
+        todayBtn = findViewById(R.id.todayBtn);
         //Lấy ngày, tháng, năm
         Calendar calendar = Calendar.getInstance();
-        yearSelect = calendar.get(Calendar.YEAR);
-        monthSelect = calendar.get(Calendar.MONTH);
-        daySelect = calendar.get(Calendar.DATE);
-        calendar.set(yearSelect, monthSelect, daySelect);
+        todayBtn.setText(String.valueOf(calendar.get(calendar.DAY_OF_MONTH)));
+//        yearSelect = calendar.get(Calendar.YEAR);
+//        monthSelect = calendar.get(Calendar.MONTH);
+//        daySelect = calendar.get(Calendar.DATE);
+//        calendar.set(yearSelect, monthSelect, daySelect);
         if ( savedInstanceState != null) {
             daySelect = savedInstanceState.getInt("Day");
             monthSelect = savedInstanceState.getInt("Month");
@@ -90,9 +90,15 @@ public class MainActivity extends AppCompatActivity {
             calendar.set(yearSelect, monthSelect, daySelect);
             try {
                 calendarView.setDate(calendar);
+                checkToday(calendar);
             } catch (OutOfDateRangeException e) {
                 throw new RuntimeException(e);
             }
+        } else {
+            yearSelect = calendar.get(Calendar.YEAR);
+            monthSelect = calendar.get(Calendar.MONTH);
+            daySelect = calendar.get(Calendar.DATE);
+            calendar.set(yearSelect, monthSelect, daySelect);
         }
         //sử dụng database
         mydb = new DBHelper(MainActivity.this);
@@ -148,32 +154,36 @@ public class MainActivity extends AppCompatActivity {
         calendarView.setHighlightedDays(calendars);
 
 
-        //Hiển thị dữ liệu vào RecycleView
-        customAdapter = new CustomAdapter(MainActivity.this,this,events_id,events_title,events_daystart ,events_timestart,events_dayend ,events_timeend, someActivityResultLauncher);
-        recyclerView.setAdapter(customAdapter);
-        recyclerView.setLayoutManager(new LinearLayoutManager(MainActivity.this));
+//        //Hiển thị dữ liệu vào RecycleView
+//        customAdapter = new CustomAdapter(MainActivity.this,this,events_id,events_title,events_daystart ,events_timestart,events_dayend ,events_timeend, someActivityResultLauncher);
+//        recyclerView.setAdapter(customAdapter);
+//        recyclerView.setLayoutManager(new LinearLayoutManager(MainActivity.this));
+        renderRecycleView();
 
         calendarView.setOnDayClickListener(new OnDayClickListener() {
             @Override
             public void onDayClick(EventDay eventDay) {
                 Calendar clickedDayCalendar = eventDay.getCalendar();
+                Calendar calendar = Calendar.getInstance();
+                checkToday(clickedDayCalendar);
                 if(customAdapter != null) {
                     customAdapter.clearData();
                 }
                 daySelect = clickedDayCalendar.get(clickedDayCalendar.DAY_OF_MONTH);
                 monthSelect = clickedDayCalendar.get(clickedDayCalendar.MONTH) ;
                 yearSelect = clickedDayCalendar.get(clickedDayCalendar.YEAR);
-                Calendar calendar = Calendar.getInstance();
+
                 calendar.set(yearSelect, monthSelect, daySelect);
                 System.out.println(calendar);
                 dateChoice = simpleDateFormat.format(calendar.getTime());
                 //Lưu dữ liệu vào Array
                 clearArrays();
                 storeDataInArrays(dateChoice);
-                //Hiển thị dữ liệu vào RecycleView
-                customAdapter = new CustomAdapter(MainActivity.this,MainActivity.this,events_id,events_title,events_daystart ,events_timestart,events_dayend ,events_timeend, someActivityResultLauncher);
-                recyclerView.setAdapter(customAdapter);
-                recyclerView.setLayoutManager(new LinearLayoutManager(MainActivity.this));
+//                //Hiển thị dữ liệu vào RecycleView
+//                customAdapter = new CustomAdapter(MainActivity.this,MainActivity.this,events_id,events_title,events_daystart ,events_timestart,events_dayend ,events_timeend, someActivityResultLauncher);
+//                recyclerView.setAdapter(customAdapter);
+//                recyclerView.setLayoutManager(new LinearLayoutManager(MainActivity.this));
+                renderRecycleView();
             }
         });
         addEvent.setOnClickListener(new View.OnClickListener() {
@@ -185,8 +195,29 @@ public class MainActivity extends AppCompatActivity {
                 intent.putExtra("Yearofevent", yearSelect);
                 startActivity(intent);
             }
-
-
+        });
+        todayBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Calendar calendar = Calendar.getInstance();
+                yearSelect = calendar.get(Calendar.YEAR);
+                monthSelect = calendar.get(Calendar.MONTH);
+                daySelect = calendar.get(Calendar.DATE);
+                dateChoice = simpleDateFormat.format(calendar.getTime());
+                if(customAdapter != null) {
+                    customAdapter.clearData();
+                }
+                //Lưu dữ liệu lấy được vào array
+                clearArrays();
+                storeDataInArrays(dateChoice);
+                try {
+                    calendarView.setDate(calendar);
+                } catch (OutOfDateRangeException e) {
+                    throw new RuntimeException(e);
+                }
+                renderRecycleView();
+                todayBtn.setVisibility(View.INVISIBLE);
+            }
         });
 
     }
@@ -194,7 +225,7 @@ public class MainActivity extends AppCompatActivity {
     void storeDataInArrays(String dateChoice) {
         Cursor cursor = mydb.readAllData(dateChoice);
         if(cursor.getCount() == 0) {
-            Toast.makeText(this, "No Data", Toast.LENGTH_SHORT).show();
+            System.out.println("No Data");
         } else {
             while (cursor.moveToNext()) {
                 events_id.add(cursor.getString(0));
@@ -225,6 +256,21 @@ public class MainActivity extends AppCompatActivity {
         events_timeend.clear();
     }
 
+    void checkToday(Calendar a) {
+        Calendar calendar = Calendar.getInstance();
+        if (a.get(a.DAY_OF_YEAR) != calendar.get(calendar.DAY_OF_YEAR)) {
+            todayBtn.setVisibility(View.VISIBLE);
+        } else {
+            todayBtn.setVisibility(View.INVISIBLE);
+        }
+    }
+
+    void renderRecycleView() {
+        //Hiển thị dữ liệu vào RecycleView
+        customAdapter = new CustomAdapter(MainActivity.this,MainActivity.this,events_id,events_title,events_daystart ,events_timestart,events_dayend ,events_timeend, someActivityResultLauncher);
+        recyclerView.setAdapter(customAdapter);
+        recyclerView.setLayoutManager(new LinearLayoutManager(MainActivity.this));
+    }
     @Override
     protected void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
