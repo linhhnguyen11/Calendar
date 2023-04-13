@@ -114,6 +114,16 @@ public class DBHelper extends SQLiteOpenHelper {
         return res;
     };
 
+    Cursor readAllDate() {
+        SQLiteDatabase db = this.getReadableDatabase();
+        String query =  "SELECT daystart, dayend FROM events ";
+        Cursor res = null;
+        if(db != null) {
+            res = db.rawQuery(query, null);
+        }
+        return res;
+    }
+
 //    @SuppressLint("Range")
 //    public ArrayList<String> getEventsByDay(String dateChoice) {
 //        ArrayList<String> array_list = new ArrayList<String>();

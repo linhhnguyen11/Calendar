@@ -20,18 +20,40 @@ import android.provider.CalendarContract;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.CalendarView;
+
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.applandeo.materialcalendarview.CalendarView;
+import com.applandeo.materialcalendarview.EventDay;
+import com.applandeo.materialcalendarview.exceptions.OutOfDateRangeException;
+import com.applandeo.materialcalendarview.listeners.OnDayClickListener;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
+import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
+    //AcvitityForResults
+    ActivityResultLauncher<Intent> someActivityResultLauncher = registerForActivityResult(
+            new ActivityResultContracts.StartActivityForResult(),
+            new ActivityResultCallback<ActivityResult>() {
+                @Override
+                public void onActivityResult(ActivityResult result) {
+                    System.out.println("Result ok");
+                    if (result.getResultCode() == Activity.RESULT_OK) {
+                        // There are no request codes
+                        System.out.println("BBBBBBBBBB");
+                        Intent data = result.getData();
+                        recreate();
+                    }
+                }
+            });
     int daySelect;
     int monthSelect;
     int yearSelect;
@@ -42,28 +64,18 @@ public class MainActivity extends AppCompatActivity {
 
     String dateChoice;
     private ActivityResultLauncher<Intent> calendarLauncher;
-    ArrayList<String> events_id, events_title, events_daystart, events_timestart, events_dayend, events_timeend;
+    ArrayList<String> events_id, events_title, events_daystart, events_timestart, events_dayend, events_timeend, events_date_start, events_date_end, events_date;
     CustomAdapter customAdapter;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        //AcvitityForResults
-        ActivityResultLauncher<Intent> someActivityResultLauncher = registerForActivityResult(
-                new ActivityResultContracts.StartActivityForResult(),
-                new ActivityResultCallback<ActivityResult>() {
-                    @Override
-                    public void onActivityResult(ActivityResult result) {
-                        if (result.getResultCode() == Activity.RESULT_OK) {
-                            // There are no request codes
-                            Intent data = result.getData();
-                            recreate();
-                        }
-                    }
-                });
+        System.out.println("AAAAAAAAAAAAAAAAAA");
+        CalendarView calendarView = findViewById(R.id.calendarView);
+
         //Layouts
+
         FloatingActionButton addEvent = findViewById(R.id.addE);
-        CalendarView calendarView = findViewById(R.id.calenderView);
         recyclerView = findViewById(R.id.recycleView);
         //Lấy ngày, tháng, năm
         Calendar calendar = Calendar.getInstance();
@@ -71,6 +83,17 @@ public class MainActivity extends AppCompatActivity {
         monthSelect = calendar.get(Calendar.MONTH);
         daySelect = calendar.get(Calendar.DATE);
         calendar.set(yearSelect, monthSelect, daySelect);
+        if ( savedInstanceState != null) {
+            daySelect = savedInstanceState.getInt("Day");
+            monthSelect = savedInstanceState.getInt("Month");
+            yearSelect = savedInstanceState.getInt("Year");
+            calendar.set(yearSelect, monthSelect, daySelect);
+            try {
+                calendarView.setDate(calendar);
+            } catch (OutOfDateRangeException e) {
+                throw new RuntimeException(e);
+            }
+        }
         //sử dụng database
         mydb = new DBHelper(MainActivity.this);
         events_id = new ArrayList<>();
@@ -79,41 +102,76 @@ public class MainActivity extends AppCompatActivity {
         events_timestart = new ArrayList<>();
         events_dayend = new ArrayList<>();
         events_timeend = new ArrayList<>();
-
-
+        events_date_start = new ArrayList<>();
+        events_date_end = new ArrayList<>();
         //Format định dạng thời gian
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
         dateChoice = simpleDateFormat.format(calendar.getTime());
         //Lưu dữ liệu lấy được vào array
         storeDataInArrays(dateChoice);
+        storeAllDateInArrays();
+        //
+        List<Date> dates = new ArrayList<>();
+        for (int i=0; i<events_date_start.size(); i++) {
+            String startDateString = events_date_start.get(i);
+            String endDateString = events_date_end.get(i);
+
+            SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
+            Date startDate = null;
+            Date endDate = null;
+
+            try {
+                startDate = format.parse(startDateString);
+                endDate = format.parse(endDateString);
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+
+            Calendar newCalendar = Calendar.getInstance();
+            newCalendar.setTime(startDate);
+            dates.add(startDate);
+
+            while (newCalendar.getTime().before(endDate)) {
+                newCalendar.add(Calendar.DATE, 1);
+                dates.add(newCalendar.getTime());
+            }
+
+        }
+
+        List<Calendar> calendars = new ArrayList<>();
+        //Hiển thị ngày có sự kiện
+        for (int i=0; i < dates.size(); i++) {
+            Calendar sample = Calendar.getInstance();
+            sample.setTime(dates.get(i));
+            calendars.add(sample);
+        }
+        calendarView.setHighlightedDays(calendars);
+
 
         //Hiển thị dữ liệu vào RecycleView
         customAdapter = new CustomAdapter(MainActivity.this,this,events_id,events_title,events_daystart ,events_timestart,events_dayend ,events_timeend, someActivityResultLauncher);
         recyclerView.setAdapter(customAdapter);
         recyclerView.setLayoutManager(new LinearLayoutManager(MainActivity.this));
-        calendarView.setOnDateChangeListener(new CalendarView.OnDateChangeListener() {
+
+        calendarView.setOnDayClickListener(new OnDayClickListener() {
             @Override
-            public void onSelectedDayChange(@NonNull CalendarView view, int year, int month, int dayOfMonth) {
+            public void onDayClick(EventDay eventDay) {
+                Calendar clickedDayCalendar = eventDay.getCalendar();
                 if(customAdapter != null) {
                     customAdapter.clearData();
                 }
-                daySelect = dayOfMonth;
-                monthSelect = month;
-                yearSelect = year;
+                daySelect = clickedDayCalendar.get(clickedDayCalendar.DAY_OF_MONTH);
+                monthSelect = clickedDayCalendar.get(clickedDayCalendar.MONTH) ;
+                yearSelect = clickedDayCalendar.get(clickedDayCalendar.YEAR);
                 Calendar calendar = Calendar.getInstance();
-                calendar.set(year, month, dayOfMonth);
+                calendar.set(yearSelect, monthSelect, daySelect);
+                System.out.println(calendar);
                 dateChoice = simpleDateFormat.format(calendar.getTime());
                 //Lưu dữ liệu vào Array
                 clearArrays();
                 storeDataInArrays(dateChoice);
                 //Hiển thị dữ liệu vào RecycleView
                 customAdapter = new CustomAdapter(MainActivity.this,MainActivity.this,events_id,events_title,events_daystart ,events_timestart,events_dayend ,events_timeend, someActivityResultLauncher);
-//                System.out.println(events_id);
-//                System.out.println(events_title);
-//                System.out.println(events_daystart);
-//                System.out.println(events_timestart);
-//                System.out.println(events_dayend);
-//                System.out.println(events_timeend);
                 recyclerView.setAdapter(customAdapter);
                 recyclerView.setLayoutManager(new LinearLayoutManager(MainActivity.this));
             }
@@ -146,11 +204,18 @@ public class MainActivity extends AppCompatActivity {
                 events_dayend.add(cursor.getString(3));
                 events_timeend.add(cursor.getString(5));
 
-
             }
         }
 
     }
+
+    void storeAllDateInArrays() {
+        Cursor cursor = mydb.readAllDate();
+        while (cursor.moveToNext()) {
+            events_date_start.add(cursor.getString(0));
+            events_date_end.add(cursor.getString(1));
+    }
+        }
     void clearArrays() {
         events_id.clear();
         events_title.clear();
@@ -159,4 +224,13 @@ public class MainActivity extends AppCompatActivity {
         events_dayend.clear();
         events_timeend.clear();
     }
+
+    @Override
+    protected void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putInt("Day", daySelect);
+        outState.putInt("Month", monthSelect);
+        outState.putInt("Year", yearSelect);
+    }
+
 }

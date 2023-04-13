@@ -5,19 +5,24 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <CalendarView
-        android:id="@+id/calenderView"
+    <com.applandeo.materialcalendarview.CalendarView
+        android:id="@+id/calendarView"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"></CalendarView>
+        android:layout_height="wrap_content"
+        app:type="one_day_picker"
+        app:highlightedDaysLabelsColor="@color/purple_700"
+        app:headerColor="@color/white"
+        app:headerLabelColor="@color/black"
+        />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recycleView"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_below="@+id/calenderView"
+        android:layout_height="387dp"
+        android:layout_below="@+id/calendarView"
         android:layout_alignParentBottom="true"
-        android:layout_marginTop="-1dp"
-        android:layout_marginBottom="82dp">
+        android:layout_marginTop="5dp"
+        android:layout_marginBottom="0dp">
 
     </androidx.recyclerview.widget.RecyclerView>
 
@@ -33,6 +38,22 @@
         android:contentDescription="@string/app_name"
         android:focusable="true"
         app:srcCompat="@drawable/ic_add" />
+
+    <Button
+        android:id="@+id/currDay"
+        style="@style/Widget.Material3.Button.TextButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentBottom="true"
+        android:layout_marginRight="105dp"
+        android:layout_marginBottom="27dp"
+        android:clickable="true"
+        android:contentDescription="@string/app_name"
+        android:focusable="true"
+        android:text="10"
+
+        android:visibility="visible" />
 
     <!--    <com.google.android.material.floatingactionbutton.FloatingActionButton-->
     <!--        android:id="@+id/addE"-->

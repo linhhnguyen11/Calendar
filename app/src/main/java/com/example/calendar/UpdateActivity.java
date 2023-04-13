@@ -25,7 +25,6 @@ public class UpdateActivity extends AppCompatActivity {
     FloatingActionButton update_button, back_button;
 
     String id, title, daystart, timestart, dayend, timeend;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -74,7 +73,9 @@ public class UpdateActivity extends AppCompatActivity {
                 }
                 myDB.updateEvent(id, title, daystart, timestart, dayend, timeend);
                 Intent intent = new Intent(getApplicationContext(),MainActivity.class);
-                startActivity(intent);
+                setResult(RESULT_OK, intent);
+//                startActivity(intent);
+                finish();
             }
         });
 
@@ -222,5 +223,10 @@ public class UpdateActivity extends AppCompatActivity {
         } else {
         Toast.makeText(this, "No data", Toast.LENGTH_SHORT).show();
         }
+    }
+
+    @Override
+    public void finish() {
+        super.finish();
     }
 }

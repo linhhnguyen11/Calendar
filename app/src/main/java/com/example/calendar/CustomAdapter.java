@@ -32,6 +32,7 @@ public class CustomAdapter extends RecyclerView.Adapter<CustomAdapter.MyViewHold
         this.events_dayend = events_dayend;
         this.events_timeend = events_timeend;
         this.someActivityResultLauncher = someActivityResultLauncher;
+        System.out.println(someActivityResultLauncher);
     }
 
     @NonNull
@@ -52,7 +53,7 @@ public class CustomAdapter extends RecyclerView.Adapter<CustomAdapter.MyViewHold
         holder.mainLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(context, UpdateActivity.class);
+                Intent intent = new Intent(activity, UpdateActivity.class);
                 intent.putExtra("id", String.valueOf(events_id.get(position)));
                 intent.putExtra("title", String.valueOf(events_title.get(position)));
                 intent.putExtra("datestart", String.valueOf(events_daystart.get(position)));
@@ -61,6 +62,7 @@ public class CustomAdapter extends RecyclerView.Adapter<CustomAdapter.MyViewHold
                 intent.putExtra("timeend", String.valueOf(events_timeend.get(position)));
 
                 someActivityResultLauncher.launch(intent);
+
             }
         });
     }

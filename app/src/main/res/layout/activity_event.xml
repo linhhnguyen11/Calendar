@@ -47,6 +47,8 @@
             android:clickable="true"
             android:contentDescription="@string/app_name"
             android:focusable="true"
+            app:pressedTranslationZ="0dp"
+            app:hoveredFocusedTranslationZ="0dp"
             app:borderWidth="0dp"
             app:rippleColor="@color/white"
             app:backgroundTint="#FFFFFF"
