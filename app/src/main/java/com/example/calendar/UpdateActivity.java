@@ -1,15 +1,19 @@
 package com.example.calendar;
 
+import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.TimePicker;
 import android.widget.Toast;
 
+import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
@@ -23,6 +27,7 @@ import java.util.Locale;
 public class UpdateActivity extends AppCompatActivity {
     EditText title_input, day_start_input, time_start_input, day_end_input, time_end_input;
     FloatingActionButton update_button, back_button;
+    Button delete_button;
 
     String id, title, daystart, timestart, dayend, timeend;
     @Override
@@ -36,7 +41,12 @@ public class UpdateActivity extends AppCompatActivity {
         time_end_input = findViewById(R.id.timeEnd2);
         update_button = findViewById(R.id.updateBtn);
         back_button = findViewById(R.id.backE2);
+        delete_button = findViewById(R.id.delete_button);
         getIntentData();
+        ActionBar ab = getSupportActionBar();
+        if (ab != null){
+            ab.setTitle(title);
+        }
         update_button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -79,7 +89,13 @@ public class UpdateActivity extends AppCompatActivity {
             }
         });
 
-
+        //xóa sự kiện
+        delete_button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                confirmDialog();
+            }
+        });
         //Sự kiện chọn ngày bắt đầu
         day_start_input.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -228,5 +244,29 @@ public class UpdateActivity extends AppCompatActivity {
     @Override
     public void finish() {
         super.finish();
+    }
+    void confirmDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Xoá " + title + " ?");
+        builder.setTitle("Bạn có chắc muốn xóa " + title + " ?");
+        builder.setPositiveButton("Có", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                DBHelper myDB = new DBHelper(UpdateActivity.this);
+                myDB.deleteEvent(id);
+                Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+                setResult(RESULT_OK, intent);
+                startActivity(intent);
+                finish();
+
+            }
+        });
+        builder.setNegativeButton("Không", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+
+            }
+        });
+        builder.create().show();
     }
 }

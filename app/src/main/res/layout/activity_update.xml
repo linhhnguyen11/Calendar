@@ -146,6 +146,14 @@
             android:textColor="@color/black"
             android:textSize="16dp" />
     </LinearLayout>
-
+        <Button
+            android:id="@+id/delete_button"
+            android:layout_width="match_parent"
+            android:layout_height="65dp"
+            android:backgroundTint="#0AFFFFFF"
+            android:text="Xóa"
+            android:textAllCaps="false"
+            android:textColor="@color/black"
+            android:textSize="15sp" />
 
 </LinearLayout>

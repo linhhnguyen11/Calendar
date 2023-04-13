@@ -97,7 +97,16 @@ public class DBHelper extends SQLiteOpenHelper {
             System.out.println("Success");
         }
     }
-
+    public void deleteEvent(String id){
+        SQLiteDatabase db = this.getWritableDatabase();
+        long result = db.delete("events", "id=?",new String[]{id});
+        if(result == -1){
+            Toast.makeText(context,"Failed",Toast.LENGTH_SHORT).show();
+        }
+        else {
+            Toast.makeText(context, "Success", Toast.LENGTH_SHORT).show();
+        }
+    }
     public Integer deleteContact (Integer id) {
         SQLiteDatabase db = this.getWritableDatabase();
         return db.delete("events",
