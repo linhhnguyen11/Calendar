@@ -232,19 +232,25 @@ public class EventActivity extends AppCompatActivity {
                     SimpleDateFormat simpleDateFormat = new SimpleDateFormat("HH:mm");
                     SimpleDateFormat inputFormat2 = new SimpleDateFormat("YYYY-MM-DD", Locale.getDefault());
                     try {
-                        Date dateStart = inputFormat2.parse(editTextDateStart);
+                        //Date dateStart = inputFormat2.parse(editTextDateStart);
                         Date timeStartValue = simpleDateFormat.parse(timeStart.getText().toString());
+
+
+
                         Calendar calendar = Calendar.getInstance();
-                        calendar.setTime(dateStart);
+//                        calendar.setTime(dateStart);
+
                         calendar.set(Calendar.HOUR,timeStartValue.getHours());
                         calendar.set(Calendar.MINUTE,timeStartValue.getMinutes());
-                        System.out.println("DATE : " + calendar);
+                        calendar.set(Calendar.SECOND,0);
+                        long alarmStartTime = calendar.getTimeInMillis();
+                        System.out.println("giờ báo thức trang even: "+calendar.getTimeInMillis());
                         AlarmManager alarmManager=(AlarmManager) getSystemService(Context.ALARM_SERVICE);
 
                         Intent intent= new Intent(this, Alarm.class);
                         intent.putExtra("mess", titleEvent.getText().toString());
                         PendingIntent pendingIntent=PendingIntent.getBroadcast(this,0,intent,PendingIntent.FLAG_CANCEL_CURRENT);
-                        alarmManager.setRepeating(AlarmManager.RTC_WAKEUP,calendar.getTimeInMillis(),AlarmManager.INTERVAL_DAY,pendingIntent);
+                        alarmManager.set(AlarmManager.RTC_WAKEUP,alarmStartTime,pendingIntent);
                         Toast.makeText(this,"Your Alarm is Set",Toast.LENGTH_LONG).show();
 
 
