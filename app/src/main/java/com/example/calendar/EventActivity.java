@@ -232,29 +232,19 @@ public class EventActivity extends AppCompatActivity {
                     SimpleDateFormat simpleDateFormat = new SimpleDateFormat("HH:mm");
                     SimpleDateFormat inputFormat2 = new SimpleDateFormat("YYYY-MM-DD", Locale.getDefault());
                     try {
-                        //Date dateStart = inputFormat2.parse(editTextDateStart);
+                        Date dateStart = inputFormat2.parse(editTextDateStart);
                         Date timeStartValue = simpleDateFormat.parse(timeStart.getText().toString());
-
-
-
                         Calendar calendar = Calendar.getInstance();
-//                        calendar.setTime(dateStart);
-
+                        calendar.setTime(dateStart);
                         calendar.set(Calendar.HOUR,timeStartValue.getHours());
                         calendar.set(Calendar.MINUTE,timeStartValue.getMinutes());
-                        calendar.set(Calendar.SECOND,0);
-                        System.out.println(calendar);
-                        System.out.println(timeStartValue.getHours());
-                        System.out.println(timeStartValue.getMinutes());
-                        long alarmStartTime = calendar.getTimeInMillis();
-                        System.out.println("giờ báo thức trang even: "+calendar.getTimeInMillis());
+                        System.out.println("DATE : " + calendar);
                         AlarmManager alarmManager=(AlarmManager) getSystemService(Context.ALARM_SERVICE);
 
                         Intent intent= new Intent(this, Alarm.class);
-                        intent.setAction("MyAction");
                         intent.putExtra("mess", titleEvent.getText().toString());
                         PendingIntent pendingIntent=PendingIntent.getBroadcast(this,0,intent,PendingIntent.FLAG_CANCEL_CURRENT);
-                        alarmManager.set(AlarmManager.RTC_WAKEUP,alarmStartTime,pendingIntent);
+                        alarmManager.setRepeating(AlarmManager.RTC_WAKEUP,calendar.getTimeInMillis(),AlarmManager.INTERVAL_DAY,pendingIntent);
                         Toast.makeText(this,"Your Alarm is Set",Toast.LENGTH_LONG).show();
 
 
